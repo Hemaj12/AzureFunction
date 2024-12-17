@@ -29,7 +29,9 @@ jobs:
 
       - name: 'Resolve Project Dependencies Using Dotnet'
         shell: bash
-        run: mkdir output
+        run: |
+          dotnet build --configuration Release --output ./output
+          popd
         
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
