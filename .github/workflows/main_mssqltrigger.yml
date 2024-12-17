@@ -29,18 +29,15 @@ jobs:
 
       - name: 'Resolve Project Dependencies Using Dotnet'
         shell: bash
-      #   run: |
-      #     pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-      #     dotnet build --configuration Release --output ./output
-      #     popd
+        run: ''
         
-      # - name: 'Run Azure Functions Action'
-      #   uses: Azure/functions-action@v1
-      #   id: fa
-      #   with:
-      #     app-name: 'mssqltrigger'
-      #     slot-name: 'Production'
-      #     package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-      #     publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BA2759BB2E5048A992D36403674CD924 }}
-      #     sku: 'flexconsumption'
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: 'mssqltrigger'
+          slot-name: 'Production'
+          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BA2759BB2E5048A992D36403674CD924 }}
+          sku: 'flexconsumption'
         
