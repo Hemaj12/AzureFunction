@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './MyAzureFunction' # Relative to repository root
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './MyAzureFunction' # Update the path to match your project structure
   DOTNET_VERSION: '8.0' # Specify the DotNet version to use
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 'Checkout Source Code'
         uses: actions/checkout@v4
@@ -23,13 +23,19 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: 'Verify Project Directory'
+        shell: bash
+        run: |
+          echo "Checking if directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} exists..."
+          if [ ! -d "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" ]; then
+            echo "Error: Directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} does not exist!"
+            echo "Please ensure the correct path is set for AZURE_FUNCTIONAPP_PACKAGE_PATH."
+            exit 1
+          fi
+
       - name: 'Restore and Build DotNet Project'
         shell: bash
         run: |
-          if [ ! -d "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" ]; then
-            echo "Error: Directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} does not exist!"
-            exit 1
-          fi
           pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
           dotnet restore
           dotnet build --configuration Release --output ./output
@@ -43,7 +49,6 @@ jobs:
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           sku: 'flexconsumption'
-
 
 
 
