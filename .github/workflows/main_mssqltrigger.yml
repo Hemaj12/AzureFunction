@@ -29,7 +29,7 @@ jobs:
 
       - name: 'Resolve Project Dependencies Using Dotnet'
         shell: bash
-        run: ''
+        run: mkdir output
         
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
