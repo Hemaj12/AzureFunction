@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy dotnet core project to Azure Function App - mssqltrigger
 
 on:
@@ -8,8 +11,8 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_NAME: 'mssqltrigger'
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './MyAzureFunction'  # Update if your project is in a subdirectory
-  DOTNET_VERSION: '8.0'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'  # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '8.0' # set this to the dotnet version to use
 
 jobs:
   build-and-deploy:
@@ -27,14 +30,17 @@ jobs:
       - name: 'Resolve Project Dependencies Using Dotnet'
         shell: bash
         run: |
-          dotnet build ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} --configuration Release --output ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output
-      
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet build --configuration Release --output ./output
+          popd
+        
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          app-name: 'mssqltrigger'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BA2759BB2E5048A992D36403674CD924 }}
           sku: 'flexconsumption'
+        
