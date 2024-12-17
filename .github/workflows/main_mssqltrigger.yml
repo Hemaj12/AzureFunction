@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy dotnet core project to Azure Function App - mssqltrigger
 
 on:
@@ -7,93 +10,36 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './MyAzureFunction' # Update the path to match your project structure
-  DOTNET_VERSION: '8.0' # Specify the DotNet version to use
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'  # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '8.0' # set this to the dotnet version to use
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: 'Checkout Source Code'
+      - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
 
-      - name: 'Setup DotNet ${{ env.DOTNET_VERSION }} Environment'
-        uses: actions/setup-dotnet@v1
+      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: 'Verify Project Directory'
+      - name: 'Resolve Project Dependencies Using Dotnet'
         shell: bash
         run: |
-          echo "Checking if directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} exists..."
-          if [ ! -d "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" ]; then
-            echo "Error: Directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} does not exist!"
-            echo "Please ensure the correct path is set for AZURE_FUNCTIONAPP_PACKAGE_PATH."
-            exit 1
-          fi
-
-      - name: 'Restore and Build DotNet Project'
-        shell: bash
-        run: |
-          pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
-          dotnet restore
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           dotnet build --configuration Release --output ./output
           popd
-
-      - name: 'Deploy to Azure Function App'
+      
+      - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
+        id: fa
         with:
-          app-name: 'mssqltrigger' # Update with your Function App name
+          app-name: 'mssqltrigger'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BA2759BB2E5048A992D36403674CD924 }}
           sku: 'flexconsumption'
-
-
-
-# # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
-# # More GitHub Actions for Azure: https://github.com/Azure/actions
-
-# name: Build and deploy dotnet core project to Azure Function App - mssqltrigger
-
-# on:
-#   push:
-#     branches:
-#       - main
-#   workflow_dispatch:
-
-# env:
-#   AZURE_FUNCTIONAPP_PACKAGE_PATH: '/home/rishi/MyAzureFunction' # set this to the path to your web app project, defaults to the repository root
-#   DOTNET_VERSION: '8.0' # set this to the dotnet version to use
-
-# jobs:
-#   build-and-deploy:
-#     runs-on: ubuntu-latest
-    
-#     steps:
-#       - name: 'Checkout GitHub Action'
-#         uses: actions/checkout@v4
-
-#       - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
-#         uses: actions/setup-dotnet@v1
-#         with:
-#           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-#       - name: 'Resolve Project Dependencies Using Dotnet'
-#         shell: bash
-#         run: |
-#           pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
-#           dotnet build --configuration Release --output ./output
-#           popd
-      
-#       - name: 'Run Azure Functions Action'
-#         uses: Azure/functions-action@v1
-#         id: fa
-#         with:
-#           app-name: 'mssqltrigger'
-#           slot-name: 'Production'
-#           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-#           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BA2759BB2E5048A992D36403674CD924 }}
-#           sku: 'flexconsumption'
         
