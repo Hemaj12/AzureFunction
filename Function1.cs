@@ -47,7 +47,7 @@ public static class MyAzureFunction
     private static async Task<string> ForwardRequestToAnotherApi(string requestData)
     {
         // Example: Send the request data to another API (middleware forward)
-        var forwardUrl = "https://example.com/api"; // Replace with actual URL
+        var forwardUrl = "https://myidexhubdevbackend.idexasia.com/api/v1/jde/customer/update/trigger"; // Replace with actual URL
 
         var response = await httpClient.PostAsync(forwardUrl, new StringContent(requestData));
         return await response.Content.ReadAsStringAsync();
